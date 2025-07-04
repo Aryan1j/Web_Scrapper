@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scrapper</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --grey-primary: #b0bec5;
+            --grey-dark: #455a64;
+            --grey-light: #eceff1;
+            --black-primary: #263238;
+            --black-secondary: #37474f;
+            --white-primary: #f9f9f9;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--black-primary) 0%, var(--black-secondary) 50%, #404040 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--white-primary);
+        }
+        
+        .main-card {
+            background: linear-gradient(145deg, var(--black-secondary), var(--black-primary));
+            border: 1px solid var(--grey-primary);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-section {
+            background: linear-gradient(145deg, #333333, var(--black-primary));
+            border: 1px solid var(--grey-primary);
+            border-radius: 20px;
+            color: var(--white-primary);
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .btn-scrape {
+            background: linear-gradient(135deg, var(--grey-primary) 0%, var(--grey-dark) 100%);
+            border: 2px solid var(--grey-primary);
+            color: var(--black-primary);
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-scrape:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(210, 210, 210, 0.3);
+            color: var(--black-primary);
+            background: linear-gradient(135deg, var(--grey-light) 0%, var(--grey-primary) 100%);
+            border-color: var(--grey-light);
+        }
+        
+        .form-control {
+            background: var(--black-secondary);
+            border: 1px solid var(--grey-primary);
+            color: var(--white-primary);
+        }
+        
+        .form-control:focus {
+            background: #333333;
+            border-color: var(--grey-light);
+            color: var(--white-primary);
+            box-shadow: 0 0 0 0.2rem rgba(210, 210, 210, 0.25);
+        }
+        
+        .input-group-text {
+            background: var(--black-secondary);
+            border: 1px solid var(--grey-primary);
+            color: var(--grey-primary);
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .loading-spinner.show {
+            display: block;
+        }
+        
+        .content-item {
+            background: linear-gradient(145deg, var(--black-secondary), var(--black-primary));
+            border: 1px solid var(--grey-primary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--grey-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .content-item:hover {
+            border-left-color: var(--grey-light);
+            transform: translateX(5px);
+        }
+        
+        .image-item {
+            border-left-color: #28a745;
+        }
+        
+        .link-item.external {
+            border-left-color: #dc3545;
+        }
+        
+        .link-item.social {
+            border-left-color: #007bff;
+        }
+        
+        .link-item.code {
+            border-left-color: #6f42c1;
+        }
+        
+        .text-content {
+            max-height: 400px;
+            overflow-y: auto;
+            background: linear-gradient(145deg, var(--black-secondary), var(--black-primary));
+            border: 1px solid var(--grey-primary);
+            padding: 20px;
+            border-radius: 10px;
+            color: var(--grey-light);
+            line-height: 1.6;
+        }
+        
+        .text-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .text-content::-webkit-scrollbar-track {
+            background: var(--black-primary);
+            border-radius: 4px;
+        }
+        
+        .text-content::-webkit-scrollbar-thumb {
+            background: var(--grey-primary);
+            border-radius: 4px;
+        }
+        
+        .nav-tabs .nav-link {
+            background: var(--black-secondary);
+            border: 1px solid var(--grey-primary);
+            color: var(--grey-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: var(--grey-primary);
+            border-color: var(--grey-primary);
+            color: var(--black-primary);
+        }
+        
+        .nav-tabs .nav-link:hover {
+            background: #333333;
+            color: var(--white-primary);
+        }
+        
+        .text-muted {
+            color: var(--grey-dark) !important;
+        }
+        
+        .text-primary {
+            color: var(--grey-light) !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
+        
+        .text-warning {
+            color: #ffc107 !important;
+        }
+        
+        .text-info {
+            color: #17a2b8 !important;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(145deg, #4a1e1e, #3a1515);
+            border: 1px solid #dc3545;
+            color: var(--white-primary);
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--grey-primary);
+            color: var(--grey-primary);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--grey-primary);
+            border-color: var(--grey-primary);
+            color: var(--black-primary);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--grey-primary);
+            color: var(--grey-primary);
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--grey-primary);
+            border-color: var(--grey-primary);
+            color: var(--black-primary);
+        }
+        
+        .badge.bg-success {
+            background: #28a745 !important;
+        }
+        
+        .badge.bg-danger {
+            background: #dc3545 !important;
+        }
+        
+        .badge.bg-primary {
+            background: #007bff !important;
+        }
+        
+        .badge.bg-warning {
+            background: #ffc107 !important;
+            color: var(--black-primary) !important;
+        }
+        
+        .badge.bg-info {
+            background: #17a2b8 !important;
+        }
+        
+        .badge.bg-secondary {
+            background: var(--grey-primary) !important;
+            color: var(--black-primary) !important;
+        }
+        
+        .spinner-border {
+            color: var(--grey-primary);
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, var(--black-secondary), var(--black-primary));
+            border: 1px solid var(--grey-primary);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(210, 210, 210, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .image-preview {
+            max-width: 100px;
+            max-height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--grey-primary);
+        }
+        
+        .link-category {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        
+        .text-highlight {
+            background: linear-gradient(135deg, var(--grey-primary), var(--grey-dark));
+            color: var(--black-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="bi bi-search"></i> Web Scrapper
+            </h1>
+            <p class="lead">Advanced extraction of text content, images, and links from any website</p>
+        </div>
+        
+        <!-- Scraper Form -->
+        <div class="main-card p-4 mb-4">
+            <h3 class="text-center mb-4">
+                <i class="bi bi-globe"></i> Enter Website URL
+            </h3>
+            
+            <form id="scraperForm">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">
+                                <i class="bi bi-link-45deg"></i>
+                            </span>
+                            <input type="url" class="form-control" id="urlInput" 
+                                   placeholder="https://example.com" required>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-scrape btn-lg w-100" id="scrapeBtn">
+                            <i class="bi bi-search"></i> Scrape
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="mt-3 text-center">
+                <small class="text-muted">Try these examples:</small><br>
+                <button class="btn btn-outline-secondary btn-sm me-2 mt-2" onclick="setUrl('https://example.com')">Example</button>
+                <button class="btn btn-outline-secondary btn-sm me-2 mt-2" onclick="setUrl('https://github.com')">GitHub</button>
+                <button class="btn btn-outline-secondary btn-sm me-2 mt-2" onclick="setUrl('https://bbc.com')">BBC</button>
+                <button class="btn btn-outline-secondary btn-sm me-2 mt-2" onclick="setUrl('https://stackoverflow.com')">Stack Overflow</button>
+            </div>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div class="loading-spinner text-center py-5" id="loadingSpinner">
+            <div class="main-card p-5">
+                <div class="spinner-border mb-3" style="width: 3rem; height: 3rem;"></div>
+                <h4>Scraping Website...</h4>
+                <p class="text-muted">Extracting and analyzing content</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary" 
+                         style="width: 75%; background-color: var(--grey-primary) !important;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Alert -->
+        <div class="alert alert-danger d-none" id="errorAlert">
+            <h5><i class="bi bi-exclamation-triangle"></i> Scraping Failed</h5>
+            <p id="errorMessage"></p>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="result-section" id="resultsSection">
+            <!-- Website Info -->
+            <div class="main-card p-4 mb-4">
+                <h4 class="mb-3">
+                    <i class="bi bi-info-circle"></i> Website Information
+                </h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">URL</h6>
+                        <p id="siteUrl" class="fw-bold text-break"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">TITLE</h6>
+                        <p id="siteTitle" class="fw-bold"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Statistics -->
+            <div class="row mb-4">
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-primary" id="wordCount">0</div>
+                        <small class="text-muted">Words</small>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-info" id="charCount">0</div>
+                        <small class="text-muted">Characters</small>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-success" id="imagesCount">0</div>
+                        <small class="text-muted">Images</small>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-warning" id="linksCount">0</div>
+                        <small class="text-muted">Links</small>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-primary" id="headingsCount">0</div>
+                        <small class="text-muted">Headings</small>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card">
+                        <div class="stat-number text-info" id="readingTime">0</div>
+                        <small class="text-muted">Min Read</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Tabs -->
+            <div class="main-card p-4">
+                <ul class="nav nav-tabs mb-4" id="contentTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text">
+                            <i class="bi bi-file-text"></i> Text Content
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images">
+                            <i class="bi bi-image"></i> Images
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="links-tab" data-bs-toggle="tab" data-bs-target="#links">
+                            <i class="bi bi-link"></i> Links
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content">
+                    <!-- Enhanced Text Content Tab -->
+                    <div class="tab-pane fade show active" id="text">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5><i class="bi bi-file-text"></i> Extracted Text Content</h5>
+                                <div class="text-content" id="textContent">
+                                    <p class="text-muted">No text content available</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h5><i class="bi bi-bar-chart"></i> Content Analysis</h5>
+                                <div class="content-item">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="text-highlight" id="paragraphCount">0</div>
+                                            <small class="d-block text-muted">Paragraphs</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-highlight" id="headingCountDetail">0</div>
+                                            <small class="d-block text-muted">Headings</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="content-item mt-3">
+                                    <h6>Reading Statistics</h6>
+                                    <p class="mb-1"><strong>Reading Time:</strong> <span id="readingTimeDetail">0 min</span></p>
+                                    <p class="mb-1"><strong>Word Count:</strong> <span id="wordCountDetail">0</span></p>
+                                    <p class="mb-0"><strong>Character Count:</strong> <span id="charCountDetail">0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Images Tab -->
+                    <div class="tab-pane fade" id="images">
+                        <h5><i class="bi bi-image"></i> Extracted Images</h5>
+                        <div id="imagesList">
+                            <p class="text-muted">No images found</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Links Tab -->
+                    <div class="tab-pane fade" id="links">
+                        <h5><i class="bi bi-link"></i> Extracted Links</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="content-item text-center">
+                                    <div class="text-highlight" id="internalLinksCount">0</div>
+                                    <small class="text-muted">Internal Links</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="content-item text-center">
+                                    <div class="text-highlight" id="externalLinksCount">0</div>
+                                    <small class="text-muted">External Links</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="content-item text-center">
+                                    <div class="text-highlight" id="socialLinksCount">0</div>
+                                    <small class="text-muted">Social Media</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="content-item text-center">
+                                    <div class="text-highlight" id="codeLinksCount">0</div>
+                                    <small class="text-muted">Code Repos</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="linksList">
+                            <p class="text-muted">No links found</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function setUrl(url) {
+            document.getElementById('urlInput').value = url;
+            // Auto-focus the input after setting URL
+            document.getElementById('urlInput').focus();
+        }
+        
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.add('show');
+            document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('errorAlert').classList.add('d-none');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSpinner').classList.remove('show');
+        }
+        
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').classList.remove('d-none');
+            hideLoading();
+        }
+        
+        function showResults() {
+            document.getElementById('resultsSection').classList.add('show');
+            hideLoading();
+        }
+        
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+        
+        function displayResults(data) {
+            // Update basic info
+            document.getElementById('siteUrl').textContent = data.url;
+            document.getElementById('siteTitle').textContent = data.title;
+            
+            // Update enhanced statistics
+            const stats = data.text_stats;
+            document.getElementById('wordCount').textContent = formatNumber(stats.word_count);
+            document.getElementById('charCount').textContent = formatNumber(stats.character_count);
+            document.getElementById('imagesCount').textContent = formatNumber(data.images.length);
+            document.getElementById('linksCount').textContent = formatNumber(data.links.length);
+            document.getElementById('headingsCount').textContent = formatNumber(stats.heading_count);
+            document.getElementById('readingTime').textContent = stats.reading_time;
+            
+            // Update detailed stats
+            document.getElementById('paragraphCount').textContent = formatNumber(stats.paragraph_count);
+            document.getElementById('headingCountDetail').textContent = formatNumber(stats.heading_count);
+            document.getElementById('readingTimeDetail').textContent = stats.reading_time + ' min';
+            document.getElementById('wordCountDetail').textContent = formatNumber(stats.word_count);
+            document.getElementById('charCountDetail').textContent = formatNumber(stats.character_count);
+            
+            // Update enhanced text content
+            const textContent = document.getElementById('textContent');
+            if (data.text_content.trim()) {
+                // Format text with better structure
+                let formattedText = data.text_content;
+                
+                // Highlight headings
+                formattedText = formattedText.replace(/\[HEADING\]\s*/g, '<h6 class="text-primary mt-3 mb-2">');
+                formattedText = formattedText.replace(/(\n|^)([^<\n]+)(\n|$)/g, '$1<p>$2</p>$3');
+                
+                // Limit display length
+                if (formattedText.length > 5000) {
+                    formattedText = formattedText.substring(0, 5000) + '<p class="text-muted"><em>... Content truncated for display</em></p>';
+                }
+                
+                textContent.innerHTML = formattedText;
+            } else {
+                textContent.innerHTML = '<p class="text-muted">No text content found</p>';
+            }
+            
+            // Update enhanced images list
+            const imagesList = document.getElementById('imagesList');
+            if (data.images.length > 0) {
+                imagesList.innerHTML = data.images.map((img, index) => `
+                    <div class="content-item image-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <img src="${img.src}" alt="${img.alt}" class="image-preview" 
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIGZpbGw9IiMzMzMzMzMiLz48dGV4dCB4PSI1MCIgeT0iNDAiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiNjY2NjY2MiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZTwvdGV4dD48L3N2Zz4='">
+                            </div>
+                            <div class="col-md-10">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Image ${index + 1} 
+                                            <span class="badge bg-secondary">${img.type}</span>
+                                            <span class="badge ${img.has_alt ? 'bg-success' : 'bg-danger'}">${img.has_alt ? 'Has Alt' : 'No Alt'}</span>
+                                        </h6>
+                                        <p class="mb-1"><strong>Alt Text:</strong> ${img.alt}</p>
+                                        ${img.title ? `<p class="mb-1"><strong>Title:</strong> ${img.title}</p>` : ''}
+                                        <p class="mb-1"><strong>Dimensions:</strong> ${img.width} × ${img.height}</p>
+                                        <p class="mb-0"><small class="text-break text-muted">${img.src}</small></p>
+                                    </div>
+                                    <div class="ms-3">
+                                        <a href="${img.src}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                imagesList.innerHTML = '<div class="content-item"><p class="text-muted mb-0">No images found</p></div>';
+            }
+            
+            // Update enhanced links list with categorization
+            const linksList = document.getElementById('linksList');
+            if (data.links.length > 0) {
+                // Count link types
+                const internalLinks = data.links.filter(link => !link.is_external).length;
+                const externalLinks = data.links.filter(link => link.is_external && !link.category.includes('Social') && !link.category.includes('Code')).length;
+                const socialLinks = data.links.filter(link => link.category.includes('Social')).length;
+                const codeLinks = data.links.filter(link => link.category.includes('Code')).length;
+                
+                document.getElementById('internalLinksCount').textContent = internalLinks;
+                document.getElementById('externalLinksCount').textContent = externalLinks;
+                document.getElementById('socialLinksCount').textContent = socialLinks;
+                document.getElementById('codeLinksCount').textContent = codeLinks;
+                
+                linksList.innerHTML = data.links.map((link, index) => {
+                    let categoryClass = 'content-item link-item';
+                    if (link.category.includes('Social')) categoryClass += ' social';
+                    else if (link.category.includes('Code')) categoryClass += ' code';
+                    else if (link.is_external) categoryClass += ' external';
+                    
+                    let badgeColor = 'bg-secondary';
+                    if (link.category.includes('Social')) badgeColor = 'bg-primary';
+                    else if (link.category.includes('Code')) badgeColor = 'bg-info';
+                    else if (link.is_external) badgeColor = 'bg-danger';
+                    else badgeColor = 'bg-success';
+                    
+                    return `
+                        <div class="${categoryClass}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">${link.text}
+                                        <span class="badge ${badgeColor}">${link.category}</span>
+                                    </h6>
+                                    <p class="mb-1"><strong>Domain:</strong> ${link.domain}</p>
+                                    ${link.title ? `<p class="mb-1"><strong>Title:</strong> ${link.title}</p>` : ''}
+                                    <p class="mb-0"><small class="text-break text-muted">${link.url}</small></p>
+                                </div>
+                                <div class="ms-3">
+                                    <a href="${link.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                linksList.innerHTML = '<div class="content-item"><p class="text-muted mb-0">No links found</p></div>';
+                document.getElementById('internalLinksCount').textContent = '0';
+                document.getElementById('externalLinksCount').textContent = '0';
+                document.getElementById('socialLinksCount').textContent = '0';
+                document.getElementById('codeLinksCount').textContent = '0';
+            }
+            
+            showResults();
+        }
+        
+        // Form submission
+        document.getElementById('scraperForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const url = document.getElementById('urlInput').value.trim();
+            const scrapeBtn = document.getElementById('scrapeBtn');
+            
+            if (!url) {
+                showError('Please enter a valid URL');
+                return;
+            }
+            
+            showLoading();
+            scrapeBtn.disabled = true;
+            scrapeBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Scraping...';
+            
+            try {
+                const response = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.data);
+                } else {
+                    showError(result.error || 'Failed to scrape website');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                scrapeBtn.disabled = false;
+                scrapeBtn.innerHTML = '<i class="bi bi-search"></i> Scrape';
+            }
+        });
+    </script>
+</body>
+</html>
